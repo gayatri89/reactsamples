@@ -14,6 +14,7 @@ class App extends Component {
     this.handleNameChange = this.handleNameChange.bind(this);
     this.updateState = this.updateState.bind(this);
     this.clearInput = this.clearInput.bind(this);
+    this.deletTask = this.deletTask.bind(this);
   }
 
   handleNameChange = (event) => {
@@ -27,7 +28,8 @@ class App extends Component {
     let temp = this.state.taskArry;
     temp.push(event.target.value)
     this.setState({
-      taskArry: temp
+      taskArry: temp,
+      data: ''
     });
     console.log(this.state.taskArry);
   }
@@ -40,12 +42,10 @@ class App extends Component {
   }
 
   deletTask(id) {
-    console.log('Delete Task'+id.target.value);
-    const remainder = this.state.taskArry.filter((todo) => {
-      if(todo.id != id) return todo;
-    });
-    console.log(remainder);
-    // Update state with filter
+    console.log('Delete Task', id);
+    let remainder = this.state.taskArry;
+     remainder.splice(id, 1);
+    console.log('&&&',remainder);
     this.setState({taskArry: remainder});
   }
 
@@ -62,8 +62,8 @@ class App extends Component {
           <button onClick={this.clearInput} >Clear</button>
         </p>
         <ul>
-         {this.state.taskArry.map((lst)=>
-          <li>{lst}<button onClick={this.deletTask.bind(this)}>X</button></li>
+         {this.state.taskArry.map((lst,i)=>
+          <li key={i} >{lst} <button onClick={this.deletTask.bind(lst,i)}>X</button></li>
         )}
         </ul>
       </div>  
