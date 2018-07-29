@@ -2,54 +2,66 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-class App extends Component {
 
+import getMuiTheme from 'material-ui/styles/getMuiTheme';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Paper from 'material-ui/Paper';
+import AppBar from 'material-ui/AppBar';
+import MenuItem from 'material-ui/MenuItem';
+import SelectField from 'material-ui/SelectField';
+import Dialog from 'material-ui/Dialog';
+
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardActions,
+  CardText
+} from 'material-ui/Card';
+import FlatButton from 'material-ui/FlatButton';
+import { fetchItems } from './api';
+
+class App extends Component {
+  state = {
+    url: 'https://api.themoviedb.org/3/movie/550?api_key=7317506170f1b233337a0a544dfb7770',
+    allMovies: [],
+    datarecieved: false,
+  };
   constructor() {
     super();
     this.state = {
-      data:'',
-      taskArry:[]
-    }
-
-    this.handleNameChange = this.handleNameChange.bind(this);
-    this.updateState = this.updateState.bind(this);
-    this.clearInput = this.clearInput.bind(this);
-    this.deletTask = this.deletTask.bind(this);
+      url: 'https://api.themoviedb.org/3/movie/550?api_key=7317506170f1b233337a0a544dfb7770',
+      allMovies: [],
+      datarecieved: false,
+    };
   }
 
-  handleNameChange = (event) => {
-    this.setState({
-      data: event.target.value
-    })
-  };
-
-  updateState(event){
-    console.log('add button click');
-    let temp = this.state.taskArry;
-    temp.push(event.target.value)
-    this.setState({
-      taskArry: temp,
-      data: ''
+  componentWillMount() {
+    const request = fetchItems(this.state.url);
+    request.then(data => {
+      console.log('&&', data);
+      const json = data.response;
+      if (json) {
+        this.setState({
+          allMovies: json,
+          datarecieved: true
+        });
+      }
     });
-    console.log(this.state.taskArry);
-  }
-
-  clearInput(){
-    console.log('clear button clicked');
-    this.setState({
-      data: ''
-    })
-  }
-
-  deletTask(id) {
-    console.log('Delete Task', id);
-    let remainder = this.state.taskArry;
-     remainder.splice(id, 1);
-    console.log('&&&',remainder);
-    this.setState({taskArry: remainder});
   }
 
   render() {
+    let movieList;
+    if (this.state.datarecieved) {
+      const movies = this.state.allMovies;
+      // const movieList = movies.filter(d => {
+      //   return d.status === selectValue;
+      // });
+      // movieList = movies.map(function(item) {
+      //   return <MovieList data={item} />;
+      // });
+    }
+
     return (
       <div className="App">
         <header className="App-header">
@@ -61,12 +73,32 @@ class App extends Component {
           <button onClick={this.updateState} value={this.state.data}>Add</button>
           <button onClick={this.clearInput} >Clear</button>
         </p>
-        <ul>
-         {this.state.taskArry.map((lst,i)=>
-          <li key={i} >{lst} <button onClick={this.deletTask.bind(lst,i)}>X</button></li>
-        )}
-        </ul>
       </div>  
+    );
+  }
+}
+
+
+class MovieList extends Component {
+  render() {
+    const { data } = this.props;
+    return (
+      <MuiThemeProvider>
+            <Paper  style={{ margin: 30, width: 400, display: 'inline-block' }}  zDepth={3}>
+                <Card style={{ padding: 10 }}>
+                  <CardHeader
+                    title={data.doctor_name}
+                    subtitle={data.clinic_name}
+                     actAsExpander={true}
+                    showExpandableButton={true}
+                  />
+                  <CardTitle
+                    title={data.procedure_name}
+                    subtitle={data.appointment_time}
+                  />
+                </Card>
+            </Paper>
+      </MuiThemeProvider>
     );
   }
 }
