@@ -22,34 +22,47 @@ import FlatButton from 'material-ui/FlatButton';
 import { fetchItems } from './api';
 
 class App extends Component {
-  state = {
-    url: 'https://api.themoviedb.org/3/movie/550?api_key=7317506170f1b233337a0a544dfb7770',
-    allMovies: [],
-    datarecieved: false,
-  };
+
   constructor() {
     super();
     this.state = {
-      url: 'https://api.themoviedb.org/3/movie/550?api_key=7317506170f1b233337a0a544dfb7770',
+      // url: 'https://api.themoviedb.org/3/search/movie?api_key=7317506170f1b233337a0a544dfb7770&language=en-US&page=1&include_adult=false&query=avengers',
       allMovies: [],
       datarecieved: false,
+      search: ''
     };
+    
+    this.handleTextChange = this.handleTextChange.bind(this);
+    this.search = this.search.bind(this);
   }
 
-  componentWillMount() {
-    const request = fetchItems(this.state.url);
+  searchData(key) {
+    const url = 'https://api.themoviedb.org/3/search/movie?api_key=7317506170f1b233337a0a544dfb7770&language=en-US&page=1&include_adult=false&query='+key
+    const request = fetchItems(url);
     request.then(data => {
       console.log('&&', data);
       const json = data.response;
       if (json) {
         this.setState({
-          allMovies: json,
+          allMovies: json.results,
           datarecieved: true
         });
       }
     });
+    this.setState({
+      search: ''
+    })
   }
 
+  handleTextChange = (event) => {
+    this.setState({
+      search: event.target.value
+    })
+  };
+  search = (event) => {
+    this.searchData(this.state.search);
+
+  };
   render() {
     let movieList;
     if (this.state.datarecieved) {
@@ -57,23 +70,25 @@ class App extends Component {
       // const movieList = movies.filter(d => {
       //   return d.status === selectValue;
       // });
-      // movieList = movies.map(function(item) {
-      //   return <MovieList data={item} />;
-      // });
+      movieList = movies.map(function(item) {
+        return <MovieList data={item} />;
+      });
     }
 
     return (
+      <MuiThemeProvider>
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>
         </header>
         <p>
-          <input type="text" value={this.state.data} onChange={this.handleNameChange} /> 
-          <button onClick={this.updateState} value={this.state.data}>Add</button>
-          <button onClick={this.clearInput} >Clear</button>
+          <input type="text" value={this.state.search} onChange={this.handleTextChange} /> 
+          <button onClick={this.search}>Search</button>
         </p>
       </div>  
+      <div>{movieList}</div>
+      </MuiThemeProvider>
     );
   }
 }
@@ -87,14 +102,14 @@ class MovieList extends Component {
             <Paper  style={{ margin: 30, width: 400, display: 'inline-block' }}  zDepth={3}>
                 <Card style={{ padding: 10 }}>
                   <CardHeader
-                    title={data.doctor_name}
-                    subtitle={data.clinic_name}
+                    title={data.title}
+                    subtitle={data.overview}
                      actAsExpander={true}
-                    showExpandableButton={true}
+                    showExpandableButton={false}
                   />
                   <CardTitle
-                    title={data.procedure_name}
-                    subtitle={data.appointment_time}
+                    title={`Release Date : ${data.release_date}`}
+                    subtitle={`Popularity : ${data.popularity}`}
                   />
                 </Card>
             </Paper>
