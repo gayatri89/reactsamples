@@ -35,25 +35,30 @@ class App extends Component {
     this.handleTextChange = this.handleTextChange.bind(this);
     this.search = this.search.bind(this);
   }
-
+componentWillMount(){
+const url = 'http://api.themoviedb.org/4/list/1?page=1&api_key=7317506170f1b233337a0a544dfb7770';
+this.loadData(url);
+}
   searchData(key) {
-    const url = 'https://api.themoviedb.org/3/search/movie?api_key=7317506170f1b233337a0a544dfb7770&language=en-US&page=1&include_adult=false&query='+key
-    const request = fetchItems(url);
-    request.then(data => {
-      console.log('&&', data);
-      const json = data.response;
-      if (json) {
-        this.setState({
-          allMovies: json.results,
-          datarecieved: true
-        });
-      }
-    });
-    this.setState({
-      search: ''
-    })
+    const url = 'https://api.themoviedb.org/3/search/movie?api_key=7317506170f1b233337a0a544dfb7770&query='+key
+    this.loadData(url);
   }
-
+loadData(url){
+  const request = fetchItems(url);
+  request.then(data => {
+    console.log('&&', data);
+    const json = data.response;
+    if (json) {
+      this.setState({
+        allMovies: json.results,
+        datarecieved: true
+      });
+    }
+  });
+  this.setState({
+    search: ''
+  })
+}
   handleTextChange = (event) => {
     this.setState({
       search: event.target.value
